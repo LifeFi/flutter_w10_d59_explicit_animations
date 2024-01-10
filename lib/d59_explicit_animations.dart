@@ -11,10 +11,11 @@ class _D59ExplicitAnimationsState extends State<D59ExplicitAnimations>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1000),
+    duration: const Duration(milliseconds: 2000),
   )
     ..forward()
-    ..repeat(reverse: true);
+    ..repeat();
+  // ..repeat(reverse: true);
 
   @override
   void dispose() {
@@ -28,8 +29,8 @@ class _D59ExplicitAnimationsState extends State<D59ExplicitAnimations>
       backgroundColor: Colors.black,
       body: Center(
         child: Container(
-          width: 250,
-          height: 250,
+          width: 300,
+          height: 300,
           alignment: Alignment.bottomCenter,
           child: GridView.builder(
             padding: EdgeInsets.zero,
@@ -43,39 +44,53 @@ class _D59ExplicitAnimationsState extends State<D59ExplicitAnimations>
                 index = row * 5 + 4 - (index % 5);
               }
               print("index $index / row $row");
-              final animation = Tween(begin: 0.0, end: 1.0).animate(
+              final appearAnimation =
+                  Tween<double>(begin: 0.0, end: 1.0).animate(
                 CurvedAnimation(
                   parent: _animationController,
-                  curve: Interval(index / 25, (index + 1) / 25,
-                      curve: Curves.easeIn),
+                  curve: Interval(index / 100, (index + 25) / 100,
+                      curve: Curves.elasticInOut),
+                ),
+              );
+              final disappearAnimation =
+                  Tween<double>(begin: 1.0, end: 0.0).animate(
+                CurvedAnimation(
+                  parent: _animationController,
+                  curve: Interval(
+                      25 / 100 + index / 100, 25 / 100 + (index + 50) / 100,
+                      curve: Curves.elasticInOut),
                 ),
               );
 
-              return AnimatedBuilder(
-                animation: animation,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: animation.value,
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      margin: const EdgeInsets.all(
-                        10,
-                      ),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3),
-                        color: Colors.red,
-                      ),
-                      child: Text(
-                        "$index",
-                        style: const TextStyle(
-                          color: Colors.white,
+              return ScaleTransition(
+                scale: disappearAnimation,
+                child: FadeTransition(
+                  opacity: disappearAnimation,
+                  child: ScaleTransition(
+                    scale: appearAnimation,
+                    child: FadeTransition(
+                      opacity: appearAnimation,
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        margin: const EdgeInsets.all(
+                          15,
                         ),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(3),
+                          color: Colors.red,
+                        ),
+                        /* child: Text(
+                          "$index",
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ), */
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               );
             },
           ),
